@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keel: loan relief console</title>
+<meta name="description" content="Keel watches a merchant's settlements, calls in Tamil before a payment is missed, and offers relief inside the lender's rules.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f2a5f'/%3E%3Cpath d='M7 17h18l-4 7H11z' fill='white'/%3E%3Cpath d='M7 13.5h18' stroke='%23e1ac4b' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/tokens.css">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.01"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8 7.5 9.5 4.3-1.5 7.5-5 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-3M4 4v4h4M4 13a8 8 0 0 0 14.9 3M20 20v-4h-4"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="appbar">
+  <div class="wrap">
+    <a class="brand" href="#live" aria-label="Keel, home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--brand-deep)"/><path d="M7 17.5h18l-4 7H11z" fill="#fff"/><path d="M7 13.5h18" stroke="var(--relief-fill)" stroke-width="3" stroke-linecap="round"/></svg>
+      <span class="wordmark">Keel</span>
+      <span class="brand-sub">Loan relief console</span>
+    </a>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-live" aria-controls="view-live" aria-selected="true" data-view="live">Live case</button>
+      <button class="tab" role="tab" id="tab-results" aria-controls="view-results" aria-selected="false" tabindex="-1" data-view="results">Test results</button>
+      <button class="tab" role="tab" id="tab-audit" aria-controls="view-audit" aria-selected="false" tabindex="-1" data-view="audit">Audit log</button>
+    </nav>
+    <span class="pill info"><span class="dot" aria-hidden="true"></span>Synthetic demo data</span>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ LIVE CASE ============ -->
+  <div class="view" id="view-live" role="tabpanel" aria-labelledby="tab-live">
+    <section class="hero" aria-label="Case summary">
+      <div class="wrap">
+        <div>
+          <div class="who">
+            <span class="avatar" id="avatar" aria-hidden="true"></span>
+            <div><div class="who-name" id="who-name"></div><div class="who-meta" id="who-meta"></div></div>
+            <span class="pill on-dark" id="loan-status"></span>
+          </div>
+          <h1 id="hero-headline"></h1>
+          <p class="hero-sub" id="hero-sub"></p>
+        </div>
+        <dl class="kpis">
+          <div class="kpi"><dt>Loan balance</dt><dd id="k-balance"></dd><div class="note" id="k-balance-note"></div></div>
+          <div class="kpi"><dt>Daily repayment</dt><dd id="k-daily"></dd><div class="note" id="k-daily-note"></div></div>
+          <div class="kpi"><dt>Loan ends</dt><dd id="k-end"></dd><div class="note" id="k-end-note"></div></div>
+        </dl>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <section class="progress" aria-label="Case progress">
+        <ol class="steps" id="steps"></ol>
+      </section>
+
+      <div class="grid">
+        <div class="stack">
+          <section class="card c-settle" aria-labelledby="h-settle">
+            <div class="card-head"><div><h2 id="h-settle">Daily settlements</h2><p class="sub" id="settle-sub"></p></div></div>
+            <svg class="chart" id="settle" viewBox="0 0 640 270" role="img" aria-label="Daily settlements against the stress line"></svg>
+            <div class="legend-row">
+              <span><i class="sw base"></i>Normal day</span>
+              <span><i class="sw low"></i>Below the stress line</span>
+              <span><i class="sw line"></i><span id="line-label">Stress line</span></span>
+            </div>
+            <div id="signal-note"></div>
+          </section>
+
+          <section class="card c-repay" aria-labelledby="h-repay">
+            <div class="card-head"><div><h2 id="h-repay">Daily repayment</h2><p class="sub">What the merchant pays each day, before and after relief.</p></div></div>
+            <svg class="chart" id="steps-chart" viewBox="0 0 640 270" role="img" aria-label="Daily repayment before and after relief"></svg>
+            <div class="legend-row">
+              <span><i class="sw base"></i>Original schedule</span>
+              <span><i class="sw low"></i>Relief period</span>
+              <span><i class="sw ghost"></i>What it would have been</span>
+            </div>
+            <dl class="facts" id="facts"></dl>
+          </section>
+        </div>
+
+        <div class="stack">
+          <section class="card c-run" aria-labelledby="h-run">
+            <div class="card-head"><div><h2 id="h-run">Place a call</h2><p class="sub">Choose how the merchant behaves, then let Keel check the stress rule and call.</p></div></div>
+            <div class="stack" style="gap:16px">
+              <div class="field">
+                <label for="persona">Merchant behaviour</label>
+                <select id="persona" aria-describedby="persona-help"></select>
+                <p class="help" id="persona-help"></p>
+              </div>
+              <fieldset class="field" style="border:0;padding:0;margin:0">
+                <legend class="legend" style="padding:0;margin-bottom:6px">Agent</legend>
+                <div class="seg" role="radiogroup">
+                  <input type="radio" name="agent" id="ag-scripted" value="scripted" checked><label for="ag-scripted">Scripted</label>
+                  <input type="radio" name="agent" id="ag-llm" value="llm"><label for="ag-llm">Sarvam model</label>
+                </div>
+                <p class="help">Scripted follows a fixed script and works offline. The Sarvam model chooses its own steps, always through the policy engine.</p>
+              </fieldset>
+              <button class="btn primary block" id="run"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg><span>Check stress and place call</span></button>
+              <button class="btn block" id="reset"><svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg>Reset demo data</button>
+            </div>
+          </section>
+
+          <section class="card c-call" aria-labelledby="h-call">
+            <div class="card-head"><div><h2 id="h-call">Conversation</h2><p class="sub" id="call-sub"></p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn small" id="play-call" hidden><svg class="ic" aria-hidden="true"><use href="#i-volume"/></svg><span>Play the call</span></button><span id="call-pill"></span></div></div>
+            <div id="chat"></div>
+            <details class="trace" id="trace-box" hidden>
+              <summary>What the agent asked the policy engine to do</summary>
+              <pre id="trace"></pre>
+            </details>
+          </section>
+
+          <section class="card c-queue" aria-labelledby="h-queue">
+            <div class="card-head"><div><h2 id="h-queue">Handover queue</h2><p class="sub">Cases passed to a person, each with a summary and its call id for the audit log.</p></div></div>
+            <div id="queue"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TEST RESULTS ============ -->
+  <div class="view wrap" id="view-results" role="tabpanel" aria-labelledby="tab-results" hidden>
+    <div class="page-head">
+      <div>
+        <h1>Test results</h1>
+        <p>About 60 scripted scenarios run against the real policy engine on synthetic data. We wrote the scenarios, so this shows the rules work as designed, not that every attack is covered.</p>
+      </div>
+      <div class="runbar">
+        <div class="field">
+          <label for="eval-mode">Agent for the normal scenarios</label>
+          <select id="eval-mode"><option value="scripted">Scripted (instant)</option><option value="llm">Sarvam model (about 3 minutes)</option></select>
+        </div>
+        <button class="btn primary" id="eval-run"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg><span>Run all scenarios</span></button>
+      </div>
+    </div>
+    <div id="eval-progress" class="help" style="margin-top:10px" aria-live="polite"></div>
+    <div id="results"></div>
+  </div>
+
+  <!-- ============ AUDIT LOG ============ -->
+  <div class="view wrap" id="view-audit" role="tabpanel" aria-labelledby="tab-audit" hidden>
+    <div class="page-head">
+      <div>
+        <h1>Audit log</h1>
+        <p>Every decision is written once and chained to the one before it. Rows cannot be edited or deleted through the app, and an edit made outside it breaks the chain.</p>
+      </div>
+      <div class="verify">
+        <button class="btn primary" id="verify"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg>Verify the chain</button>
+        <button class="btn danger" id="tamper"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg>Edit a row outside the app</button>
+      </div>
+    </div>
+    <div id="verify-out" aria-live="polite"></div>
+    <div class="toolbar" style="margin-top:18px">
+      <div class="chips" role="group" aria-label="Filter the log">
+        <button class="chip" data-filter="all" aria-pressed="true">All events</button>
+        <button class="chip" data-filter="blocks" aria-pressed="false">Blocked by a rule</button>
+        <button class="chip" data-filter="money" aria-pressed="false">Offers and consent</button>
+      </div>
+      <span class="help" id="audit-count"></span>
+    </div>
+    <div class="tablewrap">
+      <table class="data">
+        <thead><tr><th>#</th><th>Time</th><th>Call</th><th>Actor</th><th>Event</th><th>Rule</th><th>Detail</th></tr></thead>
+        <tbody id="audit"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<div id="toasts" aria-live="polite"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

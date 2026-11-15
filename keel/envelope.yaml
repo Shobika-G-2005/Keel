@@ -1,0 +1,11 @@
+# Lender envelope: the limits the policy engine enforces. Versioned by envelope_id.
+# Illustrative values for the demo, not Paytm's real terms.
+envelope_id: env-1
+stress_threshold_pct: 75        # a day below this share of normal counts as low
+stress_consecutive_days: 2      # low days in a row that trigger a signal
+min_daily_amount_rupees: 300    # lowest allowed daily repayment under relief
+max_relief_days: 14             # longest allowed relief period
+max_extension_days: 7           # longest the loan end date may move
+call_window_start: "08:00"
+call_window_end: "19:00"        # check against the RBI text before citing
+requires_consent: true
